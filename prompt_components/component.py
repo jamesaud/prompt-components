@@ -58,7 +58,7 @@ def render_component_vars(component: "Component") -> dict[t.Any, t.Any]:
 
 @t.runtime_checkable
 class Component(t.Protocol):
-    """This class is a protocol  to deal with the fact that dataclasses do not respect `is_instance` checks for inheritance.
+    """This class is a protocol to deal with the fact that dataclasses do not respect `is_instance` checks for inheritance.
     We must use runtime_checkable to check for subclasses of `Component`.
 
     Use the @dataclass_component on your components.

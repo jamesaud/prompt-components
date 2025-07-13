@@ -137,11 +137,12 @@ class Tool(Protocol):
 
 
 @dataclass_swappable_component
-class Docs(Component):
+class Docs(StringTemplate):
+    _template = "Default docs {tool.name}: {tool.description}
     tool: Tool
 
 @dataclass_component
-class JsonDocs(StringTemplate):
+class JsonDocs(Docs):
     _template = dedent("""
     {
         tool_name: {tool.name}
