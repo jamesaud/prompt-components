@@ -2,6 +2,8 @@
 
 A Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
 
+This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase, and the lack of strong type safety with existing templating engines.
+
 ## Overview
 
 This library allows you to define structured prompt components using Python's `@dataclass`. These components can then be rendered into strings using associated templates. It's particularly useful for generating text like prompts where parts of the content are reusable and parameterizable.
