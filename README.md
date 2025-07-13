@@ -138,7 +138,7 @@ class Tool(Protocol):
 
 @dataclass_swappable_component
 class Docs(StringTemplate):
-    _template = "Default docs {tool.name}: {tool.description}
+    _template = "Default docs {tool.name}: {tool.description}"
     tool: Tool
 
 @dataclass_component
