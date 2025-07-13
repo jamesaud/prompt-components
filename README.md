@@ -32,7 +32,15 @@ We find this philosophy leads to simplified refactoring and testing.
 
 ## Installation
 
-**Dependencies:**
+**From Github**
+
+Install directly from GitHub:
+
+```bash
+pip install git+https://github.com/jamesaud/prompt-components.git
+```
+
+**Locally**
 
 Install from `pyproject.toml` with your favorite package manager - the only real dependency is `jinja2`.
 
@@ -248,7 +256,7 @@ Understanding the component lifecycle, primarily driven by the `.render()` metho
 * **When it runs:** During the `.render()` call, *after* a shallow copy of the instance is made but *before* template variables are extracted from it.
 * **What it operates on:** A **shallow copy** of the component instance. Modifications **do not** affect the original object and only apply to the current render call.
 * **When to use it:** For modifications or calculations needed *specifically for rendering* without altering the original component's state. Ideal for applying formatting, calculating temporary values based on the current state, and ensuring logic is always up-to-date at render time. Generally preferred over `__post_init__` for render-specific transformations.
-* **Signature:** `def _pre_render(cls, self: t.Self):` (Requires `from typing import Self` on Python 3.11+)
+* **Signature:** `def _pre_render(cls, self: t.Self):` 
 
 Pre-render should be used for template variables that rely on calculation based on user-supplied variables.
 
