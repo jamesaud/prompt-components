@@ -290,8 +290,6 @@ The reason that `_pre_render` works on a shallow copy is:
 
 In a world where the same instance was mutated:
 - if we were to call `.render()` twice in this example, the first render would be ``Hello JOHN your full name is John Smith`` and the second would become `Hello JOHN your full name is JOHN Smith`
-- If we dynamically changed the first name, e.g. `name.first_name = "Adam"`, the call to `name.render()` would incorrectly be `Hello JOHN your full name is John Smith`.
-
 
 
 
