@@ -105,7 +105,8 @@ print(lister.render())
 ```python
 import typing as t
 from textwrap import dedent
-from prompt_components import dataclass_component, StringTemplate, Greeting # Use Greeting from Example 1
+from prompt_components import dataclass_component, StringTemplate
+
 
 @dataclass_component
 class Profile(StringTemplate):
