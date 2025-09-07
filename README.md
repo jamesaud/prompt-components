@@ -50,7 +50,7 @@ Install from `pyproject.toml` with your favorite package manager - the only real
 
 ```python
 import typing as t
-from dataclasses import field, InitVar
+from dataclasses import field
 from prompt_components import dataclass_component, StringTemplate
 
 @dataclass_component
@@ -213,7 +213,7 @@ Any class marked with `@dataclass_component` *is a dataclass* and follows all of
 
 
 ```python
-from dataclasses import field
+from dataclasses import field, InitVar
 
 @dataclass_component
 class MyTemplate(Component):
