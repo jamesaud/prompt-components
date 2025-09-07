@@ -1,10 +1,10 @@
 # Prompt Components
 
-Have you ever written string templates (Python/Jinja2), and craved for better type hint support?
-
 This is a Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
 
-This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase, and the lack of strong type hints with existing templating engines.
+This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase (particularly for LLMs), and the lack of strong type hints with existing templating engines.
+
+Have you ever written templates (Python/Jinja2) and wanted better type hint support? This library is for you!
 
 ## Overview
 
@@ -19,6 +19,7 @@ Core tenets:
 3. Type hints prevent bugs.
 
 We find this philosophy leads to simplified refactoring and testing.
+
 
 
 ## Installation
@@ -266,7 +267,9 @@ class MyComponent(StringTemplate):
     def _pre_render(cls, self: t.Self):
         self.b = self.a.upper()
 
-print(MyComponent(a="a")) # Prints MyComponent(a="a")
+component = MyComponent(a="a")
+print(component) # Prints MyComponent(a="a")
+print(component.render()) # Prints a is a, b is A
 ```
 
 **Key Features:**
@@ -397,4 +400,4 @@ class MyComponent(StringTemplate):
 
 ### Component Protocol
 
-An interface defining the expected structure of a component, including `render` and lifecycle hooks. Components should generally inherit from one of the template base classes below, which implement this protocol.
+An interface defining the expected structure of a component, including `render` and lifecycle hooks. Components should generally inherit from one of the template base classes, which implement this protocol.
