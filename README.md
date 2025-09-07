@@ -1,10 +1,11 @@
 # Prompt Components
 
+Have you ever written templates (Python/Jinja2) and wanted better type hint support? This library is for you!
+
+
 This is a Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
 
 This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase (particularly for LLMs), and the lack of strong type hints with existing templating engines.
-
-Have you ever written templates (Python/Jinja2) and wanted better type hint support? This library is for you!
 
 ## Overview
 
@@ -43,7 +44,7 @@ Install from `pyproject.toml` with your favorite package manager - the only real
 
 ```python
 import typing as t
-from dataclasses import field
+from dataclasses import field, InitVar
 from prompt_components import dataclass_component, StringTemplate
 
 @dataclass_component
@@ -170,7 +171,7 @@ class ToolsDocs(JinjaStringTemplate):
     def _pre_render(cls, self: t.Self):
         self.tools_docs = [self.docs_component(tool) for tool in self.tools]
 
-tools = [Tool(name="a", description"a tool"), Tool(name="b", description="b tool")]
+tools = [Tool(name="a", description="a tool"), Tool(name="b", description="b tool")]
 
 json_tools_docs = ToolsDocs(tools=tools)
 yaml_tools_docs = ToolsDocs(tools=tools, docs_component=YamlDocs) # Swap out components easily!
