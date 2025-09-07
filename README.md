@@ -5,7 +5,7 @@ Have you ever written templates (Python/Jinja2) and wanted better type hint supp
 
 This is a Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
 
-This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase (particularly for LLMs), and the lack of strong type hints with existing templating engines.
+This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase (particularly for LLMs), and the lack of strong type hints with existing templating enginess.
 
 ## Overview
 
