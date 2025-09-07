@@ -124,14 +124,14 @@ print(alice_profile.render())
 ### 4. Swappable Components
 
 ```python
-class Tool(Protocol):
+@dataclass
+class Tool:
     name: str
     description: str
 
 
 @dataclass_swappable_component
 class Docs(StringTemplate):
-    _template = "Default docs {tool.name}: {tool.description}"
     tool: Tool
 
 @dataclass_component
@@ -170,7 +170,7 @@ class ToolsDocs(JinjaStringTemplate):
     def _pre_render(cls, self: t.Self):
         self.tools_docs = [self.docs_component(tool) for tool in self.tools]
 
-tools = [...]
+tools = [Tool(name="a", description"a tool"), Tool(name="b", description="b tool")]
 
 # Swap out components easily!
 json_tools_docs = ToolsDocs(tools=tools)
