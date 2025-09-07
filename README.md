@@ -184,7 +184,7 @@ yaml_tools_docs = ToolsDocs(tools=tools, docs_component=YamlDocs) # Swap out com
 
 ```
 
-The `dataclass_swappable_component` must be used for swappable components (`type[<Component>]`) or an error will be raised. This is to enforce [LSP](https://en.wikipedia.org/wiki/Liskov_substitution_principle) on the initialization of the component (i.e. disallows new required fields). Notice that in `_pre_render`, the line `self.docs_component(tool)` *relies* on the init signature of the dataclass component.
+The `dataclass_swappable_component` should be used for swappable components (`type[<Component>]`). This is to enforce [LSP](https://en.wikipedia.org/wiki/Liskov_substitution_principle) on the initialization of the component (i.e. disallows new required fields). Notice that in `_pre_render`, the line `self.docs_component(tool)` *relies* on the init signature of the dataclass component.
 
 For example:
 
