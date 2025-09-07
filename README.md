@@ -2,7 +2,6 @@
 
 Have you ever written templates (Python/Jinja2) and wanted better type hint support? This library is for you!
 
-
 This is a Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
 
 This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase (particularly for LLMs), and the lack of strong type hints with existing templating engines.
@@ -21,7 +20,51 @@ Core tenets:
 
 We find this philosophy leads to simplified refactoring and testing.
 
+Consider the following prompt:
 
+```
+## AI Role
+You are an expert coder.
+
+## Instructions
+<instructions>
+Write python code to satisfy the user's query.
+</instructions>
+```
+
+What if you want to:
+- make instructions json instead of xml?
+- have multiple prompts to share the same instructions?
+
+Stop copying text around your codebase! Instead, keep things DRY by defining components:
+
+```python
+@dataclass_component
+class InstructionsXml:
+    _template = "<instructions> {text} </instructions>"
+    text: str
+
+@dataclass_component
+class Prompt(StringTemplate):
+    _template = """
+    ## AI Role
+    {ai_role}
+
+    ## Instructions
+    {instructions}
+    """
+
+    ai_role: str
+    instructions: Instructions
+
+prompt = Prompt(
+    ai_role="You are an expert coder.",
+    instructions=Instructions(
+       text="Write python code to satisfy the user's query."
+    )
+)
+print(prompt.render()) # Renders the prompt as a string
+```
 
 ## Installation
 
