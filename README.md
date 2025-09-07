@@ -1,8 +1,10 @@
 # Prompt Components
 
-A Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
+This is a Python library for creating reusable, template-based components using dataclasses. Supports standard string formatting and Jinja2 templating (from strings or files), component nesting, lifecycle hooks, and swappable component interfaces.
 
-This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase, and the lack of strong type safety with existing templating engines.
+This library emerged to fix the difficulty of maintaining shared text in prompts throughout a codebase (particularly for LLMs), and the lack of strong type hints with existing templating engines.
+
+Have you ever written templates (Python/Jinja2) and wanted better type hint support? This library is for you!
 
 ## Overview
 
@@ -18,18 +20,6 @@ Core tenets:
 
 We find this philosophy leads to simplified refactoring and testing.
 
-**Key Features:**
-
-* **Dataclass-based:** Leverages the simplicity and type-safety of dataclasses.
-* **Templating:** Supports rendering using:
-    * Standard Python `.format()` strings (`StringTemplate`).
-    * Jinja2 templates defined as strings (`JinjaStringTemplate`).
-    * Jinja2 templates loaded from files (`JinjaFileTemplateBase`).
-    * Jinja2 templates loaded from files relative to the component definition (`JinjaRelativeFileTemplateBase`).
-* **Nesting:** Components can contain other components, which are recursively rendered.
-* **Lifecycle Hooks:** Provides `render`, `_pre_render`, and `_post_render` hooks for custom logic during initialization and rendering.
-* **Swappability:** Define "swappable" components (`@dataclass_swappable_component`) that enforce a consistent initialization interface across subclasses, allowing them to be interchanged easily.
-* **Type Safety:** Uses type hints and performs checks, especially for swappable component types. Encourages to use `jinja2` constructs only where necessary, preferring to write our logic as fully type hinted python code!
 
 
 ## Installation
@@ -120,7 +110,7 @@ class Profile(StringTemplate):
 
 # Usage
 alice_profile = Profile(
-    personal_greeting=Greeting(name="Alice", age=30), 
+    personal_greeting=Greeting(name="Alice", age=30),
     bio="Loves Python."
 )
 print(alice_profile.render())
@@ -134,14 +124,14 @@ print(alice_profile.render())
 ### 4. Swappable Components
 
 ```python
-class Tool(Protocol):
+@dataclass
+class Tool:
     name: str
     description: str
 
 
 @dataclass_swappable_component
 class Docs(StringTemplate):
-    _template = "Default docs {tool.name}: {tool.description}"
     tool: Tool
 
 @dataclass_component
@@ -180,11 +170,10 @@ class ToolsDocs(JinjaStringTemplate):
     def _pre_render(cls, self: t.Self):
         self.tools_docs = [self.docs_component(tool) for tool in self.tools]
 
-tools = [...]
+tools = [Tool(name="a", description"a tool"), Tool(name="b", description="b tool")]
 
-# Swap out components easily!
 json_tools_docs = ToolsDocs(tools=tools)
-yaml_tools_docs = ToolsDocs(tools=tools, docs_component=YamlDocs)
+yaml_tools_docs = ToolsDocs(tools=tools, docs_component=YamlDocs) # Swap out components easily!
 
 ```
 
@@ -206,9 +195,9 @@ class CustomDocs(Docs):
 # It can safely be swapped out for the parent class.
 @dataclass_component
 class CustomDocs(Docs):
-    extra: str = "default_value" 
+    extra: str = "default_value"
 ```
- 
+
 
 ## Dataclass Concepts
 Any class marked with `@dataclass_component` *is a dataclass* and follows all of the semantics of dataclasses. Familiarizing yourself with the [dataclasses api](https://docs.python.org/3/library/dataclasses.html) is well advised, since this library utilizes these features to great extent.
@@ -229,7 +218,7 @@ class MyTemplate(Component):
     c: t.ClassVar[str]
     e: InitVar[int]
     d = "no type hint"
-    
+
 MyTemplate.e = "dynamic_value" # Not sent
 ```
 
@@ -240,6 +229,61 @@ The @dataclass_component decorator is a wrapper around @dataclass, and is compat
 class MyTemplate(Component):
     ...
 ```
+
+## Template Fields
+
+Template fields should be used for any field that's dynamically computed from other fields.
+
+At some point you may try to print an object with an unintialized variable and encounter errors:
+
+```python
+@dataclass_component
+class MyComponent(StringTemplate):
+    _template = "a is {a}, b is {b}"
+
+    a: str
+    b: str = field(init=False)
+
+    @classmethod
+    def _pre_render(cls, self: t.Self):
+        self.b = self.a.upper()
+
+print(MyComponent(a="a")) # > AttributeError: 'MyComponent' object has no attribute 'b'
+```
+
+The attribute is not set until `_pre_render` runs, which hasn't happened yet. To safeguard against these cases, a function `template_field()` is provided. This is merely defined as a dataclass field with some defaults set: `template_field = functools.partial(field, init=False, repr=False, compare=False)`. Correct usage would be:
+
+
+```python
+@dataclass_component
+class MyComponent(StringTemplate):
+    _template = "a is {a}, b is {b}"
+
+    a: str
+    b: str = template_field()
+
+    @classmethod
+    def _pre_render(cls, self: t.Self):
+        self.b = self.a.upper()
+
+component = MyComponent(a="a")
+print(component) # Prints MyComponent(a="a")
+print(component.render()) # Prints a is a, b is A
+```
+
+**Key Features:**
+
+* **Dataclass-based:** Leverages the simplicity and type-safety of dataclasses.
+* **Templating:** Supports rendering using:
+    * Standard Python `.format()` strings (`StringTemplate`).
+    * Jinja2 templates defined as strings (`JinjaStringTemplate`).
+    * Jinja2 templates loaded from files (`JinjaFileTemplateBase`).
+    * Jinja2 templates loaded from files relative to the component definition (`JinjaRelativeFileTemplateBase`).
+* **Nesting:** Components can contain other components, which are recursively rendered.
+* **Lifecycle Hooks:** Provides `render`, `_pre_render`, and `_post_render` hooks for custom logic during initialization and rendering.
+* **Swappability:** Define "swappable" components (`@dataclass_swappable_component`) that enforce a consistent initialization interface across subclasses, allowing them to be interchanged easily.
+* **Type Safety:** Uses type hints and performs checks, especially for swappable component types. Encourages to use `jinja2` constructs only where necessary, preferring to write our logic as fully type hinted python code!
+
 
 ## Component Lifecycle and Rendering
 
@@ -260,7 +304,7 @@ Understanding the component lifecycle, primarily driven by the `.render()` metho
 * **When it runs:** During the `.render()` call, *after* a shallow copy of the instance is made but *before* template variables are extracted from it.
 * **What it operates on:** A **shallow copy** of the component instance. Modifications **do not** affect the original object and only apply to the current render call.
 * **When to use it:** For modifications or calculations needed *specifically for rendering* without altering the original component's state. Ideal for applying formatting, calculating temporary values based on the current state, and ensuring logic is always up-to-date at render time. Generally preferred over `__post_init__` for render-specific transformations.
-* **Signature:** `def _pre_render(cls, self: t.Self):` 
+* **Signature:** `def _pre_render(cls, self: t.Self):`
 
 Pre-render should be used for template variables that rely on calculation based on user-supplied variables.
 
@@ -273,7 +317,7 @@ class Name(StringTemplate):
 
     # User vars
     first_name: str
-    last_name: str 
+    last_name: str
 
     # Template vars
     full_name: str = template_field()
@@ -353,46 +397,6 @@ class MyComponent(StringTemplate):
         return rendered_string.lstrip() # Strips the left new line character.
 ```
 
-
-## Other Concepts
-
-At some point you may try to print an object with an unintialized variable and encounter errors:
-
-```python
-@dataclass_component
-class MyComponent(StringTemplate):
-    _template = "a is {a}, b is {b}"
-
-    a: str
-    b: str = field(init=False)
-
-    @classmethod
-    def _pre_render(cls, self: t.Self):
-        self.b = self.a.upper()
-
-print(MyComponent(a="a")) # > AttributeError: 'MyComponent' object has no attribute 'b'
-```
-
-The attribute is not set until `_pre_render` runs, which hasn't happened yet. To safeguard against these cases, a function `template_field()` is provided. This is merely defined as a dataclass field with some defaults set: `template_field = functools.partial(field, init=False, repr=False, compare=False)`. Correct usage would be:
-
-
-```python
-@dataclass_component
-class MyComponent(StringTemplate):
-    _template = "a is {a}, b is {b}"
-
-    a: str
-    b: str = template_field()
-
-    @classmethod
-    def _pre_render(cls, self: t.Self):
-        self.b = self.a.upper()
-
-print(MyComponent(a="a")) # Prints MyComponent(a="a")
-```
-
 ### Component Protocol
 
-An interface defining the expected structure of a component, including `render` and lifecycle hooks. Components should generally inherit from one of the template base classes below, which implement this protocol.
-
-> **Note:** Due to how dataclasses handle inheritance checks, internal checks use `runtime_checkable` and specific helper functions rather than a simple `isinstance(obj, Component)`.
+An interface defining the expected structure of a component, including `render` and lifecycle hooks. Components should generally inherit from one of the template base classes, which implement this protocol.
