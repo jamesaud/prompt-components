@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main", "master"] # Only run on pushes to main branches
   pull_request:
-    branches: ["**"]
+    branches: ["**"] # Run on all pull requests
 
 jobs:
   test:
