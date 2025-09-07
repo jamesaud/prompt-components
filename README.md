@@ -172,9 +172,8 @@ class ToolsDocs(JinjaStringTemplate):
 
 tools = [Tool(name="a", description"a tool"), Tool(name="b", description="b tool")]
 
-# Swap out components easily!
 json_tools_docs = ToolsDocs(tools=tools)
-yaml_tools_docs = ToolsDocs(tools=tools, docs_component=YamlDocs)
+yaml_tools_docs = ToolsDocs(tools=tools, docs_component=YamlDocs) # Swap out components easily!
 
 ```
 
