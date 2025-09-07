@@ -27,10 +27,16 @@ We find this philosophy leads to simplified refactoring and testing.
 
 **From Github**
 
-Install directly from GitHub:
+With Pip:
 
 ```bash
-pip install git+https://github.com/jamesaud/prompt-components.git
+pip install prompt-components
+```
+
+With uv:
+
+```bash
+uv add prompt-components
 ```
 
 **Locally**
