@@ -120,7 +120,7 @@ class Profile(StringTemplate):
 
 # Usage
 alice_profile = Profile(
-    personal_greeting=Greeting(name="Alice", age=30), 
+    personal_greeting=Greeting(name="Alice", age=30),
     bio="Loves Python."
 )
 print(alice_profile.render())
@@ -206,9 +206,9 @@ class CustomDocs(Docs):
 # It can safely be swapped out for the parent class.
 @dataclass_component
 class CustomDocs(Docs):
-    extra: str = "default_value" 
+    extra: str = "default_value"
 ```
- 
+
 
 ## Dataclass Concepts
 Any class marked with `@dataclass_component` *is a dataclass* and follows all of the semantics of dataclasses. Familiarizing yourself with the [dataclasses api](https://docs.python.org/3/library/dataclasses.html) is well advised, since this library utilizes these features to great extent.
@@ -229,7 +229,7 @@ class MyTemplate(Component):
     c: t.ClassVar[str]
     e: InitVar[int]
     d = "no type hint"
-    
+
 MyTemplate.e = "dynamic_value" # Not sent
 ```
 
@@ -260,7 +260,7 @@ Understanding the component lifecycle, primarily driven by the `.render()` metho
 * **When it runs:** During the `.render()` call, *after* a shallow copy of the instance is made but *before* template variables are extracted from it.
 * **What it operates on:** A **shallow copy** of the component instance. Modifications **do not** affect the original object and only apply to the current render call.
 * **When to use it:** For modifications or calculations needed *specifically for rendering* without altering the original component's state. Ideal for applying formatting, calculating temporary values based on the current state, and ensuring logic is always up-to-date at render time. Generally preferred over `__post_init__` for render-specific transformations.
-* **Signature:** `def _pre_render(cls, self: t.Self):` 
+* **Signature:** `def _pre_render(cls, self: t.Self):`
 
 Pre-render should be used for template variables that rely on calculation based on user-supplied variables.
 
@@ -273,7 +273,7 @@ class Name(StringTemplate):
 
     # User vars
     first_name: str
-    last_name: str 
+    last_name: str
 
     # Template vars
     full_name: str = template_field()
@@ -396,3 +396,31 @@ print(MyComponent(a="a")) # Prints MyComponent(a="a")
 An interface defining the expected structure of a component, including `render` and lifecycle hooks. Components should generally inherit from one of the template base classes below, which implement this protocol.
 
 > **Note:** Due to how dataclasses handle inheritance checks, internal checks use `runtime_checkable` and specific helper functions rather than a simple `isinstance(obj, Component)`.
+
+## License
+
+This project is licensed under the MIT License:
+
+```
+MIT License
+
+Copyright (c) 2024 prompt-components contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
